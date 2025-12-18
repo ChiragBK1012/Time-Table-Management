@@ -17,6 +17,8 @@ A complete backend system for managing college timetables using Node.js, Express
   - Update and delete timetable entries
   - View weekly or daily timetables
   - Automatic duplicate slot validation
+  - Some filter methods for both faculty and students
+  - Checks for the faculty or section clash in timetable 
 
 - **Database**
   - AWS DynamoDB with optimized table structure
@@ -255,6 +257,41 @@ DELETE /admin/timetable/deleteSlot?year_section=5A&day=MONDAY&slot=2
 Authorization: Bearer <token>
 ```
 
+#### Get All Slots for a Faculty (Admin)
+
+```
+GET /admin/timetable/faculty/RSH
+Authorization: Bearer <token>
+```
+
+Query parameters alternative:
+
+```
+GET /admin/timetable/faculty/RSH
+GET /admin/timetable/faculty?faculty=RSH
+Authorization: Bearer <token>
+```
+
+#### Get Faculty Daily Teaching Load (Admin)
+
+Business rule: A teacher can teach a **maximum of 5 slots per day**.
+
+```
+GET /admin/timetable/faculty/daily-load?faculty=RSH&day=MONDAY
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "message": "Daily load for faculty 'RSH' on MONDAY calculated successfully",
+  "faculty": "RSH",
+  "day": "MONDAY",
+  "assignedSlots": 3,
+  "remainingSlots": 2,
+  "maxSlotsPerDay": 5
+}
+```
+
 ### Student Timetable Endpoints (Protected)
 
 **Note:** All student endpoints require authentication. Authentication is handled via:
@@ -277,6 +314,35 @@ Authorization: Bearer <token>
 ```
 GET /student/timetable/day/5A/MONDAY
 Authorization: Bearer <token>
+```
+
+#### Get Next Upcoming Class for a Subject (Student)
+
+Returns the **next** upcoming class (day and slot) for a given subject in a year/section, based on the **current server day and time**.
+
+- Past classes in the current week are ignored.
+- If there is no remaining class this week, the **first occurrence in the next week** is returned.
+
+```
+GET /student/timetable/next-class/5A/DBMS
+Authorization: Bearer <token>
+
+Response example:
+{
+  "success": true,
+  "message": "Next class for subject 'DBMS' in yearSection '5A' retrieved successfully",
+  "yearSection": "5A",
+  "subject": "DBMS",
+  "nextClass": {
+    "day": "TUESDAY",
+    "slot": 3,
+    "subject": "DBMS",
+    "faculty": "RSH",
+    "room": "LHC-315",
+    "type": "Theory",
+    "isNextWeek": false
+  }
+}
 ```
 
 ## 🧪 Postman Testing Guide
@@ -431,10 +497,25 @@ Authorization: Bearer <token>
      ```
 
 4. **Delete Slot:**
+
    - Method: `DELETE`
    - URL: `{{base_url}}/admin/timetable/deleteSlot?year_section=5A&day=MONDAY&slot=3`
    - **Note**: Cookie is automatically sent. No headers needed if using cookies.
    - Optional Headers (if using Bearer token instead):
+     - `Authorization`: `Bearer {{admin_token}}`
+
+5. **Get All Slots for a Faculty (Admin):**
+
+   - Method: `GET`
+   - URL: `{{base_url}}/admin/timetable/faculty/RSH`
+   - Headers:
+     - `Authorization`: `Bearer {{admin_token}}`
+
+6. **Get Faculty Daily Teaching Load (Admin):**
+
+   - Method: `GET`
+   - URL: `{{base_url}}/admin/timetable/faculty/daily-load?faculty=RSH&day=MONDAY`
+   - Headers:
      - `Authorization`: `Bearer {{admin_token}}`
 
 ### Step 5: Test Student Timetable Operations
@@ -447,8 +528,16 @@ Authorization: Bearer <token>
      - `Authorization`: `Bearer {{student_token}}`
 
 2. **Get Day Timetable:**
+
    - Method: `GET`
    - URL: `{{base_url}}/student/timetable/day/5A/MONDAY`
+   - Headers:
+     - `Authorization`: `Bearer {{student_token}}`
+
+3. **Get Next Upcoming Class for a Subject (Student):**
+
+   - Method: `GET`
+   - URL: `{{base_url}}/student/timetable/next-class/5A/DBMS`
    - Headers:
      - `Authorization`: `Bearer {{student_token}}`
 
