@@ -20,5 +20,10 @@ router.get(
   studentAuthMiddleware,
   timetableController.getDayTimetable
 );
+router.get(
+  "/timetable/next-class/:yearSection/:subject",
+  studentAuthMiddleware,
+  timetableController.getNextClassForSubject
+);
 
 module.exports = router;

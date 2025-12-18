@@ -31,4 +31,21 @@ router.delete(
   timetableController.deleteSlot
 );
 
+// Get daily teaching load for a faculty (admin-only)
+// Example: GET /admin/timetable/faculty/daily-load?faculty=RSH&day=MONDAY
+router.get(
+  "/timetable/faculty/daily-load",
+  adminAuthMiddleware,
+  timetableController.getFacultyDailyLoad
+);
+
+// Get all slots for a given faculty (admin-only)
+// Example: GET /admin/timetable/faculty/RSH
+//          or   /admin/timetable/faculty?faculty=RSH
+router.get(
+  "/timetable/faculty/:facultyName",
+  adminAuthMiddleware,
+  timetableController.getSlotsByFaculty
+);
+
 module.exports = router;
