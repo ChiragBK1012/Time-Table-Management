@@ -11,19 +11,19 @@ router.post("/logout", studentAuthController.logoutStudent);
 
 // Timetable routes (protected with student middleware)
 router.get(
-  "/timetable/weekly/:yearSection",
-  studentAuthMiddleware,
-  timetableController.getWeeklyTimetable
+    "/timetable/weekly/:yearSection",
+    studentAuthMiddleware,
+    timetableController.getWeeklyTimetable
 );
 router.get(
-  "/timetable/day/:yearSection/:day",
-  studentAuthMiddleware,
-  timetableController.getDayTimetable
+    "/timetable/day/:yearSection/:day",
+    studentAuthMiddleware,
+    timetableController.getDayTimetable
 );
 router.get(
-  "/timetable/next-class/:yearSection/:subject",
-  studentAuthMiddleware,
-  timetableController.getNextClassForSubject
+    "/timetable/next-class/:yearSection/:subject",
+    studentAuthMiddleware,
+    timetableController.getNextClassForSubject
 );
 
 module.exports = router;
