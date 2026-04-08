@@ -634,3 +634,4 @@ ISC
 ## 👨‍💻 Author
 
 Backend System for College Timetable Management
+using using Node.js, Express.js, and AWS DynamoDB
